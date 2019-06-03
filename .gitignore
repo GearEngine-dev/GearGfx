@@ -1,5 +1,6 @@
 /GearGfx/.vs
 /GearGfx/GearGfx/Debug
+/Debug
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
