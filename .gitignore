@@ -1,0 +1,5 @@
+/GearGfx/.vs
+/GearGfx/GearGfx/Debug
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
