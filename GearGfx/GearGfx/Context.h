@@ -37,5 +37,6 @@ private:
 	bool mInitial = false;
 	DeviceFeatures mExt;
 	VkInstance mInstance;
+	VkPhysicalDevice mGpu;
 };
 GFX_NAMESPACE_END

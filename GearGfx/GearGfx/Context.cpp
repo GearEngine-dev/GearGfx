@@ -48,14 +48,52 @@ bool Context::initial(const char ** instanceExt, uint32_t instanceExtCount)
 		return itr != std::end(queriedExtensions);
 	};
 
+	for (uint32_t i = 0; i < instanceExtCount; i++)
+		if (!hasExtension(instanceExt[i]))
+			return false;
+
+	if (hasExtension(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME))
+	{
+		mExt.supports_physical_device_properties2 = true;
+		instanceExts.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+	}
+
+	if (mExt.supports_physical_device_properties2 &&
+		hasExtension(VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME) &&
+		hasExtension(VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME))
+	{
+		instanceExts.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+		instanceExts.push_back(VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME);
+		instanceExts.push_back(VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME);
+		mExt.supports_external = true;
+	}
+
+	if (hasExtension(VK_EXT_DEBUG_UTILS_EXTENSION_NAME))
+	{
+		instanceExts.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+		mExt.supports_debug_utils = true;
+	}
+
 #ifdef VULKAN_DEBUG
-	instanceExts.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
-	instanceLayers.push_back("VK_LAYER_LUNARG_standard_validation");
+	const auto hasLayer = [&](const char *name) -> bool 
+	{
+		auto itr = std::find_if(std::begin(queriedLayers), std::end(queriedLayers), [name](const VkLayerProperties &e) -> bool 
+		{
+			return strcmp(e.layerName, name) == 0;
+		});
+		return itr != std::end(queriedLayers);
+	};
+
+	if (!mExt.supports_debug_utils && hasExtension(VK_EXT_DEBUG_REPORT_EXTENSION_NAME))
+		instanceExts.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+
+	if (hasLayer("VK_LAYER_LUNARG_standard_validation"))
+		instanceLayers.push_back("VK_LAYER_LUNARG_standard_validation");
 #endif
 	VkInstanceCreateInfo createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	createInfo.pApplicationInfo = &appInfo;
-	createInfo.enabledExtensionCount = instanceExts.size();;
+	createInfo.enabledExtensionCount = instanceExts.size();
 	createInfo.ppEnabledExtensionNames = instanceExts.empty() ? nullptr : instanceExts.data();;
 	createInfo.enabledLayerCount = instanceLayers.size();
 	createInfo.ppEnabledLayerNames = instanceLayers.empty() ? nullptr : instanceLayers.data();
@@ -73,11 +111,50 @@ Device * Context::createDevice(const char ** deviceExt, uint32_t deviceExtCount)
 {
 	if (!mInitial)
 	{
-		//todo
+		throw std::runtime_error("must to create instance!");
 		return nullptr;
 	}
-		
-	return nullptr;
+	
+	uint32_t gpuCount = 0;
+	if (vkEnumeratePhysicalDevices(mInstance, &gpuCount, nullptr) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to find gpu!");
+		return nullptr;
+	}
+
+	if (gpuCount == 0)
+	{
+		throw std::runtime_error("failed to find gpu!");
+		return nullptr;
+	}
+
+	std::vector<VkPhysicalDevice> gpus(gpuCount);
+	if (vkEnumeratePhysicalDevices(mInstance, &gpuCount, gpus.data()) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to find gpu!");
+		return nullptr;
+	}
+
+	for (auto &g : gpus)
+	{
+		VkPhysicalDeviceProperties props;
+		vkGetPhysicalDeviceProperties(g, &props);
+		LOGI("Found Vulkan GPU: %s\n", props.deviceName);
+		LOGI("    API: %u.%u.%u\n",
+			VK_VERSION_MAJOR(props.apiVersion),
+			VK_VERSION_MINOR(props.apiVersion),
+			VK_VERSION_PATCH(props.apiVersion));
+		LOGI("    Driver: %u.%u.%u\n",
+			VK_VERSION_MAJOR(props.driverVersion),
+			VK_VERSION_MINOR(props.driverVersion),
+			VK_VERSION_PATCH(props.driverVersion));
+	}
+	//默认选择第一块显卡
+	mGpu = gpus.front();
+
+	Device* device = new Device();
+	device->mGpu = mGpu;
+	return device;
 }
 
 
