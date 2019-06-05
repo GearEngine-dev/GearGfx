@@ -1,7 +1,9 @@
 #pragma once
 #include <GfxDefine.h>
 #include <memory>
+#include <vulkan.h>
 GFX_NAMESPACE_BEGIN
+class Context;
 class Device
 {
 public:
@@ -9,7 +11,9 @@ public:
 	virtual~Device();
 
 private:
+	friend class Context;
 	void create();
+	VkPhysicalDevice mGpu;
 };
 
 
