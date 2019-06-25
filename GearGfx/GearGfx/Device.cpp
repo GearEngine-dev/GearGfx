@@ -10,8 +10,4 @@ Device::~Device()
 {
 }
 
-void Device::create()
-{
-}
-
 GFX_NAMESPACE_END

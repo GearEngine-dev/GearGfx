@@ -1,7 +1,6 @@
 #pragma once
 #include <GfxDefine.h>
 #include <memory>
-#include <vulkan.h>
 GFX_NAMESPACE_BEGIN
 class Context;
 class Device
@@ -12,8 +11,14 @@ public:
 
 private:
 	friend class Context;
-	void create();
 	VkPhysicalDevice mGpu;
+	VkDevice mDevice;
+	VkQueue mGraphicsQueue = VK_NULL_HANDLE;
+	VkQueue mComputeQueue = VK_NULL_HANDLE;
+	VkQueue mTransferQueue = VK_NULL_HANDLE;
+	uint32_t mGraphicsQueueFamily = VK_QUEUE_FAMILY_IGNORED;
+	uint32_t mComputeQueueFamily = VK_QUEUE_FAMILY_IGNORED;
+	uint32_t mTransferQueueFamily = VK_QUEUE_FAMILY_IGNORED;
 };
 
 
