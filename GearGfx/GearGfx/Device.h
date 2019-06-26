@@ -8,11 +8,23 @@ class Device
 public:
 	Device();
 	virtual~Device();
-
+	VkDevice getDevice()
+	{
+		return mDevice;
+	}
+	VkPhysicalDevice getGPU()
+	{
+		return mGPU;
+	}
+	VkSurfaceKHR getSurface()
+	{
+		return mSurface;
+	}
 private:
 	friend class Context;
-	VkPhysicalDevice mGpu;
+	VkPhysicalDevice mGPU;
 	VkDevice mDevice;
+	VkSurfaceKHR mSurface;
 	VkQueue mGraphicsQueue = VK_NULL_HANDLE;
 	VkQueue mComputeQueue = VK_NULL_HANDLE;
 	VkQueue mTransferQueue = VK_NULL_HANDLE;
