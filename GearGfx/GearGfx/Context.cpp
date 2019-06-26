@@ -148,22 +148,22 @@ Device * Context::createDevice(VkSurfaceKHR surface)
 			VK_VERSION_PATCH(props.driverVersion));
 	}
 	//默认选择第一块显卡
-	mGpu = gpus.front();
+	mGPU = gpus.front();
 
 	uint32_t graphicsQueueFamily = VK_QUEUE_FAMILY_IGNORED;
 	uint32_t computeQueueFamily = VK_QUEUE_FAMILY_IGNORED;
 	uint32_t transferQueueFamily = VK_QUEUE_FAMILY_IGNORED;
 
 	uint32_t queueCount;
-	vkGetPhysicalDeviceQueueFamilyProperties(mGpu, &queueCount, nullptr);
+	vkGetPhysicalDeviceQueueFamilyProperties(mGPU, &queueCount, nullptr);
 	std::vector<VkQueueFamilyProperties> queueProps(queueCount);
-	vkGetPhysicalDeviceQueueFamilyProperties(mGpu, &queueCount, queueProps.data());
+	vkGetPhysicalDeviceQueueFamilyProperties(mGPU, &queueCount, queueProps.data());
 
 	for (unsigned i = 0; i < queueCount; i++)
 	{
 		VkBool32 supported = surface == VK_NULL_HANDLE;
 		if (surface != VK_NULL_HANDLE)
-			vkGetPhysicalDeviceSurfaceSupportKHR(mGpu, i, surface, &supported);
+			vkGetPhysicalDeviceSurfaceSupportKHR(mGPU, i, surface, &supported);
 
 		static const VkQueueFlags required = VK_QUEUE_COMPUTE_BIT | VK_QUEUE_GRAPHICS_BIT;
 		if (supported && ((queueProps[i].queueFlags & required) == required))
@@ -286,12 +286,13 @@ Device * Context::createDevice(VkSurfaceKHR surface)
 	deviceInfo.pEnabledFeatures = &deviceFeatures;
 
 	VkDevice _device;
-	if (vkCreateDevice(mGpu, &deviceInfo, nullptr, &_device) != VK_SUCCESS)
+	if (vkCreateDevice(mGPU, &deviceInfo, nullptr, &_device) != VK_SUCCESS)
 		return nullptr;
 
 	Device* device = new Device();
-	device->mGpu = mGpu;
+	device->mGPU = mGPU;
 	device->mDevice = _device;
+	device->mSurface = surface;
 	device->mGraphicsQueueFamily = graphicsQueueFamily;
 	device->mComputeQueueFamily = computeQueueFamily;
 	device->mTransferQueueFamily = transferQueueFamily;

@@ -26,7 +26,7 @@ private:
 	std::vector<const char*> mValidationLayers;
 	std::vector<const char*> mDeviceExtensions;
 	VkInstance mInstance;
-	VkPhysicalDevice mGpu;
+	VkPhysicalDevice mGPU;
 };
 
 GFX_NAMESPACE_END
