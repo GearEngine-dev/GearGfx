@@ -22,6 +22,8 @@ private:
 	SwapChainSupportDetails querySwapChainSupport();
 	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes);
+	void cleanupSwapChain();
+	void createSwapChain(const VkExtent2D &extent);
 private:
 	Device* mDevice;
 	VkSwapchainKHR mSwapChain;
