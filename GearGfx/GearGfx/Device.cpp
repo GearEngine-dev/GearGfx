@@ -8,6 +8,7 @@ Device::Device()
 }
 Device::~Device()
 {
+	vkDestroyDevice(mDevice, nullptr);
 }
 
 GFX_NAMESPACE_END
