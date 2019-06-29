@@ -300,6 +300,7 @@ Device * Context::createDevice(VkSurfaceKHR surface)
 	vkGetDeviceQueue(_device, computeQueueFamily, computeQueueIndex, &device->mComputeQueue);
 	vkGetDeviceQueue(_device, transferQueueFamily, transferQueueIndex, &device->mTransferQueue);
 
+	device->createCommandPool();
 	return device;
 }
 
