@@ -23,12 +23,15 @@ int main()
 	exten.width = WIDTH;
 	exten.height = HEIGHT;
 	swapchain->initial(exten);
-	
+	gfx::CommandBufferType type = gfx::CommandBufferType::Graphics;
+	gfx::CommandBufferLevel level = gfx::CommandBufferLevel::Primary;
+	gfx::CommandBuffer* cmd = device->allocCommandBuffer(type, level);
 	while (!glfwWindowShouldClose(window)) 
 	{
 		glfwPollEvents();
 	}
 	glfwDestroyWindow(window);
+	delete cmd;
 	delete swapchain;
 	delete device;
 	getchar();
